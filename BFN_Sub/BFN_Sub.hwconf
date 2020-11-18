@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ASCII"?>
+<device:XMLDevice xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:device="http://www.silabs.com/ss/hwconfig/document/device.ecore" name="EFM32TG11B120F128GM32" partId="mcu.arm.efm32.tg11.efm32tg11b120f128gm32" contextId="com.silabs.sdk.stack.super:2.6.0._1265011391">
+  <mode name="DefaultMode">
+    <property object="ADC0" propertyId="ABPeripheral.included" value="true"/>
+    <property object="ADC0" propertyId="ADC.hal_adc_mode.ENUM" value="scan"/>
+    <property object="DefaultMode" propertyId="mode.diagramLocation" value="100, 100"/>
+    <property object="PB11" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PB13" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PB14" propertyId="ports.settings.pinmode" value="Push-pull"/>
+    <property object="PORTIO" propertyId="portio.timer1.enable.cc0" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.rx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.enable.tx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.usart0_rxloc" value="4"/>
+    <property object="PORTIO" propertyId="portio.usart0.location.usart0_txloc" value="4"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
+    <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
+    <property object="TIMER1" propertyId="ABPeripheral.included" value="true"/>
+    <property object="TIMER1" propertyId="TIMER.BSP_TIMER_CC0.PIN" value="PC13"/>
+    <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
+    <property object="USART0" propertyId="USART.BSP_USART_MISO.PIN" value="PB8"/>
+    <property object="USART0" propertyId="USART.BSP_USART_MOSI.PIN" value="PB7"/>
+    <property object="USART0" propertyId="USART.BSP_USART_RX.PIN" value="PB8"/>
+    <property object="USART0" propertyId="USART.BSP_USART_TX.PIN" value="PB7"/>
+    <property object="USART0" propertyId="USART.HAL_USART_BAUD_RATE.INT" value="9600"/>
+    <property object="USART1" propertyId="ABPeripheral.included" value="true"/>
+    <property object="USART1" propertyId="USART.BSP_USART_MISO.PIN" value="PC1"/>
+    <property object="USART1" propertyId="USART.BSP_USART_MOSI.PIN" value="PC0"/>
+    <property object="USART1" propertyId="USART.BSP_USART_RX.PIN" value="PC1"/>
+    <property object="USART1" propertyId="USART.BSP_USART_TX.PIN" value="PC0"/>
+    <property object="USART1" propertyId="USART.HAL_USART_BAUD_RATE.INT" value="9600"/>
+  </mode>
+  <modeTransition>
+    <property object="RESET &#x2192; DefaultMode" propertyId="modeTransition.source" value="RESET"/>
+    <property object="RESET &#x2192; DefaultMode" propertyId="modeTransition.target" value="DefaultMode"/>
+  </modeTransition>
+</device:XMLDevice>
