@@ -317,7 +317,7 @@ void SensorTask(void *p_arg) {
 			CurOhm[i] = temp10;
 		}
 
-
+		SettingOhm = CurOhm[0];
 
 		OSTimeDly(1000,  /*   1000 OS Ticks  */
 		OS_OPT_TIME_DLY, /*   from now.      */
@@ -379,7 +379,7 @@ void WorkAsGroundChecker(unsigned char offset)
 				break;
 
 			case GndChk_Setting:
-				if((offset % 2) == 0) {
+				if((g_index % 2) == 0) {
 					CleanGndAlert();
 				} else {
 					DrawGround(SettingOhm, CurOhm[g_index]);
