@@ -757,7 +757,10 @@ void Wait_Flash_WarmUp() {
 
 void MD_KEY_init(void) {
 	//PD7 key
-	GPIO_PinModeSet(gpioPortD, 7U, gpioModeInput, 1);
+	//GPIO_PinModeSet(gpioPortD, 7U, gpioModeInput, 1);
+
+	//PF2
+	GPIO_PinModeSet(gpioPortF, 2U, gpioModeInput, 1);
 }
 
 void MD_OLED_init(void) {

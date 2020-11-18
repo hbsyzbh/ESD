@@ -249,6 +249,7 @@ void SensorTask(void *p_arg) {
 	ADC0Init.reference = adcRefVDD;
 	ADC0Init.acqTime = adcAcqTime256;
 	ADC0Init.diff = false;
+
 	ADC[0].ID = ADC_ScanSingleEndedInputAdd(&ADC0Init, adcScanInputGroup0,
 			adcPosSelAPORT0XCH4);
 	ADC[1].ID = ADC_ScanSingleEndedInputAdd(&ADC0Init, adcScanInputGroup0,
@@ -257,8 +258,7 @@ void SensorTask(void *p_arg) {
 			adcPosSelAPORT0XCH6);
 	ADC[3].ID = ADC_ScanSingleEndedInputAdd(&ADC0Init, adcScanInputGroup0,
 			adcPosSelAPORT0XCH7);
-
-	ADC[4].ID = ADC_ScanSingleEndedInputAdd(&ADC0Init, adcScanInputGroup0,
+	ADC[4].ID = ADC_ScanSingleEndedInputAdd(&ADC0Init, adcScanInputGroup1,
 			adcPosSelAPORT3XCH12);
 
 	ADC_InitScan(ADC0, &ADC0Init);
@@ -282,10 +282,8 @@ void SensorTask(void *p_arg) {
 		}
 
 		ADC_Start(ADC0, adcStartScan);
-		while (!(ADC0->STATUS & ADC_STATUS_SCANDV)) {
-			OSTimeDly(100, OS_OPT_TIME_DLY, &err);
-		}
 		OSSchedLock(&err);
+		while ( ! (ADC0->STATUS & ADC_STATUS_SCANDV));
 		while ((ADC0->STATUS & ADC_STATUS_SCANDV)) {
 			Result = ADC0->SCANDATAX;
 			for (i = 0; i < ADCChannels; i++) {
@@ -305,14 +303,16 @@ void SensorTask(void *p_arg) {
 				delta = ADC[4].Value - ADC[i].Value;
 			}
 
-			float temp10 = 510.0 * ADC[i].Value;
-			if(delta > 0) {
+			float temp10 = 1000 * ADC[i].Value;
+
+			if(delta == 0) {
+				temp10 = 999;
+			} else {
 				temp10 /= delta;
+				//temp10 -= 10;
 			}
 
-			if((delta == 0) || (temp10 > 999)) {
-				temp10 = 999;
-			}
+			if(temp10 > 999)  temp10 = 999;
 
 			CurOhm[i] = temp10;
 		}
@@ -417,7 +417,8 @@ void WorkAsGroundChecker(unsigned char offset)
 unsigned char getKeys(void)
 {
 	unsigned char Keys = 0;
-	Keys = ! GPIO_PinInGet(gpioPortD, 7U);
+	//Keys = ! GPIO_PinInGet(gpioPortD, 7U);
+	Keys = ! GPIO_PinInGet(gpioPortF, 2U);
 
 	return Keys;
 }

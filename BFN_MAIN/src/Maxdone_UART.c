@@ -36,16 +36,48 @@ void MD_UART_init( void )
    USART_InitAsync( USART0, &init );
    USART_InitAsync( USART1, &init );
 
-   GPIO_PinModeSet( PORTIO_USART0_RX_PORT, PORTIO_USART0_RX_PIN, gpioModeInputPull, 1 );
-   GPIO_PinModeSet( PORTIO_USART0_TX_PORT, PORTIO_USART0_TX_PIN, gpioModePushPull, 1 );
+   if ( getKeys() )
+   {
+	   GPIO_PinModeSet( PORTIO_USART0_RX_PORT, PORTIO_USART0_RX_PIN, gpioModeInputPull, 1 );
+	   GPIO_PinModeSet( PORTIO_USART0_TX_PORT, PORTIO_USART0_TX_PIN, gpioModePushPull, 1 );
+	   USART0->ROUTELOC0 = ( 	 BSP_USART0_RX_LOC << _USART_ROUTELOC0_RXLOC_SHIFT
+			   	   	   	   	   | BSP_USART0_TX_LOC << _USART_ROUTELOC0_TXLOC_SHIFT);
+	   USART0->ROUTEPEN  = (      USART_ROUTEPEN_RXPEN
+	                            | USART_ROUTEPEN_TXPEN );
+
+   } else
+   {
+/*
+#define PORTIO_USART0_RX_PIN             (11U)
+#define PORTIO_USART0_RX_PORT            (gpioPortE)
+#define PORTIO_USART0_RX_LOC             (0U)
+
+#define PORTIO_USART0_TX_PIN             (10U)
+#define PORTIO_USART0_TX_PORT            (gpioPortE)
+#define PORTIO_USART0_TX_LOC             (0U)
+
+#define HAL_USART0_ENABLE                (1)
+
+#define BSP_USART0_TX_PIN                (10U)
+#define BSP_USART0_TX_PORT               (gpioPortE)
+#define BSP_USART0_TX_LOC                (0U)
+
+#define BSP_USART0_RX_PIN                (11U)
+#define BSP_USART0_RX_PORT               (gpioPortE)
+#define BSP_USART0_RX_LOC                (0U)
+*/
+
+	   GPIO_PinModeSet( gpioPortE, 11, gpioModeInputPull, 1 );
+	   GPIO_PinModeSet( gpioPortE, 10, gpioModePushPull, 1 );
+	   USART0->ROUTELOC0 = ( 	 0U << _USART_ROUTELOC0_RXLOC_SHIFT
+			   	   	   	   	   | 0U << _USART_ROUTELOC0_TXLOC_SHIFT);
+	   USART0->ROUTEPEN  = (      USART_ROUTEPEN_RXPEN
+	                            | USART_ROUTEPEN_TXPEN );
+   }
 
    GPIO_PinModeSet( PORTIO_USART1_RX_PORT, PORTIO_USART1_RX_PIN, gpioModeInputPull, 1 );
    GPIO_PinModeSet( PORTIO_USART1_TX_PORT, PORTIO_USART1_TX_PIN, gpioModePushPull, 1 );
 
-   USART0->ROUTELOC0 = ( 	 BSP_USART0_RX_LOC << _USART_ROUTELOC0_RXLOC_SHIFT
-		   	   	   	   	   | BSP_USART0_TX_LOC << _USART_ROUTELOC0_TXLOC_SHIFT);
-   USART0->ROUTEPEN  = (      USART_ROUTEPEN_RXPEN
-                            | USART_ROUTEPEN_TXPEN );
 
 
    USART1->ROUTELOC0 = ( 	 BSP_USART1_RX_LOC << _USART_ROUTELOC0_RXLOC_SHIFT

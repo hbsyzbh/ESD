@@ -17,7 +17,6 @@
     <property object="PORTIO" propertyId="portio.uart0.location.uart0_rxloc" value="5"/>
     <property object="PORTIO" propertyId="portio.usart0.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart0.enable.tx" value="Enabled"/>
-    <property object="PORTIO" propertyId="portio.usart0.location.usart0_rxloc" value="4"/>
     <property object="PORTIO" propertyId="portio.usart0.location.usart0_txloc" value="4"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.rx" value="Enabled"/>
     <property object="PORTIO" propertyId="portio.usart1.enable.tx" value="Enabled"/>
@@ -25,7 +24,7 @@
     <property object="TIMER1" propertyId="TIMER.BSP_TIMER_CC0.PIN" value="PC13"/>
     <property object="UARTNCP" propertyId="ABPeripheral.included" value="true"/>
     <property object="USART0" propertyId="ABPeripheral.included" value="true"/>
-    <property object="USART0" propertyId="USART.BSP_USART_MISO.PIN" value="PB8"/>
+    <property object="USART0" propertyId="USART.BSP_USART_MISO.PIN" value="PE11"/>
     <property object="USART0" propertyId="USART.BSP_USART_MOSI.PIN" value="PB7"/>
     <property object="USART0" propertyId="USART.BSP_USART_RX.PIN" value="PB8"/>
     <property object="USART0" propertyId="USART.BSP_USART_TX.PIN" value="PB7"/>

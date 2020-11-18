@@ -96,8 +96,11 @@ void UartTasksInit(void) {
 
 	InitDone = 1;
 
-	//while(1)
-	//	USBUartSendBuff("Maxdone!", 8);
+#if 0
+	DrawLogo();
+	while(1)
+		USBUartSendBuff("Maxdone!", 8);
+#endif
 }
 
 #define ACK_BUFF_SIZE	(48)
