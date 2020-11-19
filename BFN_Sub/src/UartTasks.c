@@ -109,9 +109,9 @@ void FillDebugACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
 
 	OSSchedLock(&err);
-	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04dT% 03dH% 03d% 04d% 04d% 04d% 04d% 04d% 04d",
-			UserData.RF_ID, UserData.state, getLastT(), getLastH(), getAlertOhmInt(),
-			getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3)
+	snprintf(Buff, ACK_BUFF_SIZE, "SUB% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d",
+			getAlertOhmInt(), getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3),
+			getCurOhmInt(4), getCurOhmInt(5), getCurOhmInt(6), getCurOhmInt(7)
 	);
 	OSSchedUnlock(&err);
 }
@@ -121,7 +121,10 @@ void FillACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
 
 	OSSchedLock(&err);
-	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04dT% 03dH% 03dA", UserData.RF_ID, getLastT(), getLastH());
+	snprintf(Buff, ACK_BUFF_SIZE, "SUB% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d",
+			getAlertOhmInt(), getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3),
+			getCurOhmInt(4), getCurOhmInt(5), getCurOhmInt(6), getCurOhmInt(7)
+	);
 	OSSchedUnlock(&err);
 }
 
