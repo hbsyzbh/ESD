@@ -103,15 +103,17 @@ void UartTasksInit(void) {
 #endif
 }
 
-#define ACK_BUFF_SIZE	(48)
+#define ACK_BUFF_SIZE	(80)
 
 void FillDebugACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
 
 	OSSchedLock(&err);
-	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04dT% 03dH% 03d% 04d% 04d% 04d% 04d% 04d% 04d",
-			UserData.RF_ID, UserData.state, getLastT(), getLastH(), getAlertOhmInt(),
-			getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3)
+	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04d T%03d H%03d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d",
+			UserData.RF_ID, getLastT(), getLastH(), getAlertOhmInt(),
+			getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3),
+			getCurOhmInt(4), getCurOhmInt(5), getCurOhmInt(6), getCurOhmInt(7),
+			getCurOhmInt(8), getCurOhmInt(9), getCurOhmInt(10), getCurOhmInt(11)
 	);
 	OSSchedUnlock(&err);
 }
@@ -157,7 +159,9 @@ void E22UartTask(void *p_arg) {
 	}
 }
 
-void USBUartTask(void *p_arg) {
+unsigned char bIsSetting = 0;
+
+void SettingTask(void *p_arg) {
 	OS_MSG_SIZE msg_size;
 	CPU_TS ts;
 	RTOS_ERR err;
@@ -211,6 +215,57 @@ void USBUartTask(void *p_arg) {
 				}
 			}
 		}
+	}
+}
+
+int getNumber(char *str, unsigned char len)
+{
+	int result = 0;
+	for(int i = 0; i < len; i++)
+	{
+		result *= 10;
+		if((str[i] >= '0') && (str[i] <= '9')) {
+			result += str[i] - '0';
+		}
+	}
+
+	return result;
+}
+
+void CommuSubTask(void *p_arg) {
+	OS_MSG_SIZE msg_size;
+	CPU_TS ts;
+	RTOS_ERR err;
+	char Buff[ACK_BUFF_SIZE];
+    char cmd[] =  "DEBUG";
+
+	for (;;) {
+		for (int i = 0; i < 5; i++) {
+			USBUART_Tx(cmd[i]);
+		}
+
+		char *str = OSQPend(&USBUartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
+				&msg_size, &ts, &err);
+		if ((RTOS_ERR_NONE == err.Code) && (msg_size > 0) && (str != NULL)) {
+			//Beep();  SUB 999 151 999 999 999 052 999 999 000
+			if ((39 == msg_size) && (0 == memcmp(str, "SUB", 3))) {
+				extern unsigned int CurOhm[12];
+				for(int i = 0; i < 8; i++)
+				{
+					CurOhm[4 + i] = getNumber(&str[7 + i * 4], 4);
+				}
+			}
+		}
+
+		OSTimeDly(1000, OS_OPT_TIME_DLY, &err);
+	}
+}
+
+void USBUartTask(void *p_arg) {
+	if(bIsSetting) {
+		SettingTask(p_arg);
+	} else {
+		CommuSubTask(p_arg);
 	}
 }
 

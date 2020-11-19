@@ -36,8 +36,10 @@ void MD_UART_init( void )
    USART_InitAsync( USART0, &init );
    USART_InitAsync( USART1, &init );
 
+   extern unsigned char bIsSetting;
    if ( getKeys() )
    {
+	   bIsSetting = 1;
 	   GPIO_PinModeSet( PORTIO_USART0_RX_PORT, PORTIO_USART0_RX_PIN, gpioModeInputPull, 1 );
 	   GPIO_PinModeSet( PORTIO_USART0_TX_PORT, PORTIO_USART0_TX_PIN, gpioModePushPull, 1 );
 	   USART0->ROUTELOC0 = ( 	 BSP_USART0_RX_LOC << _USART_ROUTELOC0_RXLOC_SHIFT
