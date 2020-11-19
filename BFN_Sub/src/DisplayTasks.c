@@ -303,13 +303,14 @@ void SensorTask(void *p_arg) {
 			while ( ! (ADC0->STATUS & ADC_STATUS_SINGLEDV));
 			ADC[i].Value = ADC_DataSingleGet(ADC0);
 
-			float temp10 = 25 * ADC[i].Value / 4096;
+			//float temp10 = 12.5 * ADC[i].Value * 100 / (4096.0 * 1.25);
+			float temp10 = 20 * ADC[i].Value * 100 / 4096.0;
 
-			temp10 = temp10 * 62 / 1.25;
-			temp10 -= 10;
+			if(temp10 > 150)
+				temp10 -= 150;
+			else temp10 = 0;
 
 			if(temp10 > 999)  temp10 = 999;
-			if(temp10 < 0)  temp10 = 0;
 
 			CurOhm[i] = temp10;
 		}
@@ -368,6 +369,7 @@ void WorkAsGroundChecker(unsigned char offset)
 
 		g_index ++;
 		if( g_index >= 8) g_index = 0;
+		//g_index = 0;
 		switch(GndChkState)
 		{
 			case GndChk_Normal:
