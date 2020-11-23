@@ -434,6 +434,21 @@ void DrawHanzi(unsigned char offset) {
 	}
 }
 
+void cleanHanzi()
+{
+	int i, j;
+
+	for (j = 0; j < 2; j++) {
+		MD_OLED_Write_i(0xB0 + j);
+		MD_OLED_Write_i(0x00 + 0);
+		MD_OLED_Write_i(0x10 + 0);
+
+		for(i = 0; i<128;i++) {
+			MD_OLED_Write_d(0);
+		}
+	}
+}
+
 void DrawLogo(void) {
 	int i, j;
 

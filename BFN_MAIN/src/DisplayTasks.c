@@ -351,7 +351,7 @@ void WorkAsHumiture(unsigned char offset)
 	}
 }
 
-unsigned char g_index = 0;
+unsigned char g_index = 0xFF;
 void WorkAsGroundChecker(unsigned char offset)
 {
 	if((offset % 5) == 0)
@@ -472,15 +472,17 @@ void OLEDTask(void *p_arg) {
 		{
 			case SysState_humiture:
 				WorkAsHumiture(offset);
-				DrawHanzi(offset);
+				//DrawHanzi(offset);
 				break;
 			case SysState_ground:
 				WorkAsGroundChecker(offset);
 				break;
 			default:
 				if(offset % 32 >= 16) {
+					cleanHanzi();
 					WorkAsHumiture(offset);
-					DrawHanzi(offset);
+					//DrawHanzi(offset);
+					g_index = 0xFF;
 				} else {
 					WorkAsGroundChecker(offset);
 				}
