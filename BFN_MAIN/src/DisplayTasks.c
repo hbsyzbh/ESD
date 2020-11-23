@@ -22,7 +22,7 @@ unsigned char Sensor_Data[6];
 unsigned int H;
 unsigned int T;
 unsigned int SettingOhm;
-unsigned int CurOhm[12];
+unsigned int CurOhm[32];
 
 
 ADCResult ADC[ADCChannels];

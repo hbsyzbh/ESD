@@ -93,7 +93,7 @@ void UartTasksInit(void) {
 	if (UserData.AlertOhm > 999) UserData.AlertOhm = 999;
 
 	if (UserData.state >= SysState_undefined) UserData.state = SysState_both;
-
+	UserData.subs = 0;
 	InitDone = 1;
 
 #if 0
@@ -103,7 +103,7 @@ void UartTasksInit(void) {
 #endif
 }
 
-#define ACK_BUFF_SIZE	(48)
+#define ACK_BUFF_SIZE	(128)
 
 void FillDebugACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
@@ -116,6 +116,18 @@ void FillDebugACK(char *Buff, unsigned char len) {
 	OSSchedUnlock(&err);
 }
 
+void FillSubACK (char *Buff, unsigned char len, unsigned char count) {
+	RTOS_ERR err;
+
+	OSSchedLock(&err);
+	snprintf(Buff, len, "SUB");
+
+	for(int i = 0; i < count; i++)
+	{
+		snprintf(&Buff[3 + i*4], len - 3 - i*4, "%04d", getCurOhmInt(i));
+	}
+	OSSchedUnlock(&err);
+}
 
 void FillACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
@@ -188,29 +200,17 @@ void USBUartTask(void *p_arg) {
 				for (int i = 0; i < strnlen(Buff, ACK_BUFF_SIZE); i++) {
 					USBUART_Tx(Buff[i]);
 				}
-			} else if ((9 == msg_size) && (0 == memcmp(str, "SETID", 5))) {
-				strncpy(Buff, &(str[5]), 4);
-				Buff[4] = 0;
-				UserData.RF_ID = getRFIDFromComPort(Buff);
-				saveUserData();
-				Beep();
-			} else if ((12 == msg_size) && (0 == memcmp(str, "SETALERT", 8))) {
-				strncpy(Buff, &(str[8]), 4);
-				Buff[4] = 0;
-				UserData.AlertOhm = getRFIDFromComPort(Buff);
-				saveUserData();
-				Beep();
-			} else if ((7 == msg_size) && (0 == memcmp(str, "SETSYS", 6))) {
-				UserData.state = str[6] - '0';
-				saveUserData();
-				Beep();
-			} else if ((5 == msg_size) && (0 == memcmp(str, "RFCFG", 5))) {
-				SetE22State(E22_Config);
-				isRFCfg = true;
-				Beep();
-			} else {
-				for (int i = 0; i < msg_size; i++) {
-					USBUART_Tx(str[i]);
+			} else if ((15 == msg_size) && (0 == memcmp(str, "SUB", 3))) {
+				char buff[5] = {0};
+
+				strncpy(buff, &str[3], 4);
+				UserData.subs = getRFIDFromComPort(buff);
+
+				strncpy(buff, &str[11], 4);
+				UserData.AlertOhm = getRFIDFromComPort(buff);
+				FillSubACK(Buff, ACK_BUFF_SIZE, UserData.subs);
+				for (int i = 0; i < strnlen(Buff, ACK_BUFF_SIZE); i++) {
+					USBUART_Tx(Buff[i]);
 				}
 			}
 		}

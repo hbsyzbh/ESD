@@ -22,7 +22,7 @@ unsigned char Sensor_Data[6];
 unsigned int H;
 unsigned int T;
 unsigned int SettingOhm;
-unsigned int CurOhm[12];
+unsigned int CurOhm[32];
 
 
 ADCResult ADC[ADCChannels];
@@ -354,8 +354,10 @@ void WorkAsGroundChecker(unsigned char offset)
 {
 	if((offset % 5) == 0)
 	{
-		for(int i = 0; i< 8; i++)
+		for(int i = 0; i < 8; i++)
 		{
+			if ( i >= UserData.subs) continue;
+
 			if(CurOhm[i] > UserData.AlertOhm)
 			{
 				Beep();
@@ -369,12 +371,12 @@ void WorkAsGroundChecker(unsigned char offset)
 
 		g_index ++;
 		if( g_index >= 8) g_index = 0;
-		//g_index = 0;
+		if ( g_index >= UserData.subs) g_index = 0;
 		switch(GndChkState)
 		{
 			case GndChk_Normal:
 				DrawGround(UserData.AlertOhm, CurOhm[g_index]);
-				Draw4816DotNumEx(false, 48, 3, g_index);
+				Draw4816DotNumEx(false, 48, 3, g_index + 1);
 				break;
 
 			case GndChk_Setting:
@@ -382,12 +384,12 @@ void WorkAsGroundChecker(unsigned char offset)
 					CleanGndAlert();
 				} else {
 					DrawGround(SettingOhm, CurOhm[g_index]);
-					Draw4816DotNumEx(false, 48, 3, g_index);
+					Draw4816DotNumEx(false, 48, 3, g_index + 1);
 				}
 				break;
 		}
 	}
-
+#if 0
 	RTOS_ERR err;
 	OS_MSG_SIZE IsLongPressing;
 	char *key = OSQPend(&KeyQ, 0, OS_OPT_PEND_NON_BLOCKING, &IsLongPressing, NULL, &err);
@@ -410,6 +412,7 @@ void WorkAsGroundChecker(unsigned char offset)
 				break;
 		}
 	}
+#endif
 }
 
 //这个理论上应该移动到 bios bsp 才对

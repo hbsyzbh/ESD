@@ -18,6 +18,7 @@ typedef struct {
 	unsigned short RF_ID;
 	unsigned int AlertOhm;
 	SYS_STATE state;
+	unsigned char subs;
 	unsigned int dummy;
 }	USER_DATA;
 

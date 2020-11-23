@@ -63,6 +63,7 @@ void saveUserData(void)
 	//没必要不修改，保护Flash
 	if( (UserData.RF_ID 	!= pFlashUserData->RF_ID) 	 ||
 		(UserData.AlertOhm  != pFlashUserData->AlertOhm) ||
+		(UserData.subCount  != pFlashUserData->subCount) ||
 		(UserData.state  != pFlashUserData->state)
 	) {
 		MSC_ErasePage(USERDATA_BASE);
@@ -111,12 +112,15 @@ void FillDebugACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
 
 	OSSchedLock(&err);
-	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04d T%03d H%03d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d% 04d",
-			UserData.RF_ID, getLastT(), getLastH(), getAlertOhmInt(),
-			getCurOhmInt(0), getCurOhmInt(1), getCurOhmInt(2), getCurOhmInt(3),
-			getCurOhmInt(4), getCurOhmInt(5), getCurOhmInt(6), getCurOhmInt(7),
-			getCurOhmInt(8), getCurOhmInt(9), getCurOhmInt(10), getCurOhmInt(11)
+	snprintf(Buff, ACK_BUFF_SIZE, "MDC%04d T%03d H%03d A%03d C%03d",
+			UserData.RF_ID, getLastT(), getLastH(), getAlertOhmInt(), UserData.subCount
 	);
+
+	for(int i = 0; i < UserData.subCount; i++)
+	{
+		snprintf( &Buff[27 + i * 4], ACK_BUFF_SIZE, " %03d", getCurOhmInt(i));
+	}
+
 	OSSchedUnlock(&err);
 }
 
@@ -245,9 +249,15 @@ void CommuSubTask(void *p_arg) {
 	CPU_TS ts;
 	RTOS_ERR err;
     char cmd[32] = "SUB";
-    snprintf(cmd, 32, "SUB%04d ALT%04d", UserData.subCount, UserData.AlertOhm);
 
 	for (;;) {
+	    unsigned char wantSubs = 0;
+
+	    if(UserData.subCount > 4) {
+	    	wantSubs = UserData.subCount - 4;
+	    }
+	    snprintf(cmd, 32, "SUB%04d ALT%04d", wantSubs, UserData.AlertOhm);
+
 		for (int i = 0; i < 15; i++) {
 			USBUART_Tx(cmd[i]);
 		}
@@ -255,12 +265,16 @@ void CommuSubTask(void *p_arg) {
 		char *str = OSQPend(&USBUartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
 				&msg_size, &ts, &err);
 		if ((RTOS_ERR_NONE == err.Code) && (msg_size > 0) && (str != NULL)) {
-			//Beep();  SUB 999 151 999 999 999 052 999 999 000
-			if ((39 == msg_size) && (0 == memcmp(str, "SUB", 3))) {
-				extern unsigned int CurOhm[12];
-				for(int i = 0; i < 8; i++)
+			//Beep();  SUB 151 999 999 999 052 999 999 000
+			if ((0 == memcmp(str, "SUB", 3))) {
+				extern unsigned int CurOhm[];
+				for(int i = 0; i < UserData.subCount - 4; i++)
 				{
-					CurOhm[4 + i] = getNumber(&str[7 + i * 4], 4);
+					if(3 + i * 4 < msg_size) {
+						CurOhm[4 + i] = getNumber(&str[3 + i * 4], 4);
+					} else {
+						break;
+					}
 				}
 			}
 		}
