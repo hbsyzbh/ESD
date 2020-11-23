@@ -92,6 +92,8 @@ void UartTasksInit(void) {
 
 	if (UserData.AlertOhm > 999) UserData.AlertOhm = 999;
 
+	if (UserData.subCount > 28) UserData.subCount = 28;
+
 	if (UserData.state >= SysState_undefined) UserData.state = SysState_both;
 
 	InitDone = 1;
@@ -195,6 +197,12 @@ void SettingTask(void *p_arg) {
 				UserData.RF_ID = getRFIDFromComPort(Buff);
 				saveUserData();
 				Beep();
+			} else if ((10 == msg_size) && (0 == memcmp(str, "SETSUB", 6))) {
+				strncpy(Buff, &(str[6]), 4);
+				Buff[4] = 0;
+				UserData.subCount = getRFIDFromComPort(Buff);
+				saveUserData();
+				Beep();
 			} else if ((12 == msg_size) && (0 == memcmp(str, "SETALERT", 8))) {
 				strncpy(Buff, &(str[8]), 4);
 				Buff[4] = 0;
@@ -236,11 +244,11 @@ void CommuSubTask(void *p_arg) {
 	OS_MSG_SIZE msg_size;
 	CPU_TS ts;
 	RTOS_ERR err;
-	char Buff[ACK_BUFF_SIZE];
-    char cmd[] =  "DEBUG";
+    char cmd[32] = "SUB";
+    snprintf(cmd, 32, "SUB%04d ALT%04d", UserData.subCount, UserData.AlertOhm);
 
 	for (;;) {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 15; i++) {
 			USBUART_Tx(cmd[i]);
 		}
 
