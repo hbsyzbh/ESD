@@ -140,35 +140,55 @@ void FillACK(char *Buff, unsigned char len) {
 	OSSchedUnlock(&err);
 }
 
+int getNumber(char *str, unsigned char len)
+{
+	int result = 0;
+	for(int i = 0; i < len; i++)
+	{
+		result *= 10;
+		if((str[i] >= '0') && (str[i] <= '9')) {
+			result += str[i] - '0';
+		}
+	}
+
+	return result;
+}
+
 void E22UartTask(void *p_arg) {
 	OS_MSG_SIZE msg_size;
 	CPU_TS ts;
 	RTOS_ERR err;
-	char Buff[ACK_BUFF_SIZE];
+	char cmd[32] = "SUB";
 
 	for (;;) {
+		unsigned char wantSubs = 0;
 
-		snprintf(Buff, 32, "MDQ%04d", UserData.RF_ID);
-		char *str = OSQPend(&E22UartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
+		if(UserData.subs > 8) {
+			wantSubs = UserData.subs - 8;
+		}
+		snprintf(cmd, 32, "SUB%04d ALT%04d", wantSubs, UserData.AlertOhm);
+
+		for (int i = 0; i < 15; i++) {
+			USBUART_Tx(cmd[i]);
+		}
+
+		char *str = OSQPend(&USBUartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
 				&msg_size, &ts, &err);
 		if ((RTOS_ERR_NONE == err.Code) && (msg_size > 0) && (str != NULL)) {
-			//E22UART_Tx(str[i]);
-			if(isRFCfg) {
-				for (int i = 0; i < msg_size; i++) {
-					USBUART_Tx(str[i]);
-				}
-				continue;
-			}
-
-			if ((7 == msg_size) && (0 == memcmp(str, Buff, msg_size))) {
-				//Beep();
-				//FillACK(Buff, ACK_BUFF_SIZE);
-				FillDebugACK(Buff, ACK_BUFF_SIZE);
-				for (int i = 0; i < strnlen(Buff, ACK_BUFF_SIZE); i++) {
-					E22UART_Tx(Buff[i]);
+			if ((0 == memcmp(str, "SUB", 3))) {
+				extern unsigned int CurOhm[];
+				for(int i = 0; i < UserData.subs - 8; i++)
+				{
+					if(3 + i * 4 < msg_size) {
+						CurOhm[8 + i] = getNumber(&str[3 + i * 4], 4);
+					} else {
+						break;
+					}
 				}
 			}
 		}
+
+		OSTimeDly(1000, OS_OPT_TIME_DLY, &err);
 	}
 }
 
