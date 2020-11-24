@@ -169,10 +169,10 @@ void E22UartTask(void *p_arg) {
 		snprintf(cmd, 32, "SUB%04d ALT%04d", wantSubs, UserData.AlertOhm);
 
 		for (int i = 0; i < 15; i++) {
-			USBUART_Tx(cmd[i]);
+			E22UART_Tx(cmd[i]);
 		}
 
-		char *str = OSQPend(&USBUartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
+		char *str = OSQPend(&E22UartAnalysisQ, 0, OS_OPT_PEND_BLOCKING,
 				&msg_size, &ts, &err);
 		if ((RTOS_ERR_NONE == err.Code) && (msg_size > 0) && (str != NULL)) {
 			if ((0 == memcmp(str, "SUB", 3))) {
