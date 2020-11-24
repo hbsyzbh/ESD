@@ -106,7 +106,7 @@ void UartTasksInit(void) {
 #endif
 }
 
-#define ACK_BUFF_SIZE	(80)
+#define ACK_BUFF_SIZE	(160)
 
 void FillDebugACK(char *Buff, unsigned char len) {
 	RTOS_ERR err;
@@ -291,7 +291,7 @@ void USBUartTask(void *p_arg) {
 	}
 }
 
-#define USART0_RX_BUFF_SIZE (64)
+#define USART0_RX_BUFF_SIZE (128)
 static unsigned char USART0_RX_BUFF[USART0_RX_BUFF_SIZE];
 static unsigned char USART0_RX_Ptr = 0;
 void USART0_IRQHandler(void) {
@@ -333,7 +333,7 @@ void USBUartTimerCallback(void *p_tmr, void *p_arg) {
 	}
 }
 
-#define USART_RX_BUFF_SIZE (64)
+#define USART_RX_BUFF_SIZE (128)
 static unsigned char USART1_RX_BUFF[USART_RX_BUFF_SIZE];
 static unsigned char USART1_RX_Ptr = 0;
 void USART1_IRQHandler(void) {
